@@ -226,10 +226,7 @@ class DFRobot_AHT20:
       return []
 
   def get_sensor_value(self):
-    print("AHT20 sensor value:")
     temperature_c = self.get_temperature_C()
     temperature_f = self.get_temperature_F()
     humidity      = self.get_humidity_RH()
-    print("temperature(-40~85 C): %.2f C, %.2f F    humidity(0~100 %%RH): %.2f %%RH"%(temperature_c, temperature_f, humidity))
-    print("*"*25)
-    return (format(temperature_c, ".2f"), format(humidity, ".2f"))
+    return (format(temperature_c, ".2f") + "C",format(temperature_f, ".2f") + "F", format(humidity, ".2f") + "RH")

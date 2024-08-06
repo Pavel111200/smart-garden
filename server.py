@@ -1,4 +1,4 @@
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler
 from functools import cached_property
 from moisture import Moisture
 from light import Light
@@ -11,18 +11,10 @@ HOST = "192.168.2.236"
 PORT = 9999
 moisture_sensor = Moisture()
 light_sensor = Light()
-aht20 = DFRobot_AHT20()
-air_quality = Air_quality()
+aht20_sensor = DFRobot_AHT20()
+air_quality_sensor = Air_quality()
 
-data = {
-    "moisture": 0,
-    "temperature": 0,
-    "humidity": 0,
-    "light": 0,
-    "air_quality": 0
-}
-
-class SmartGardenHTTPServer(BaseHTTPRequestHandler):
+class SmartGardenHTTPHandler(BaseHTTPRequestHandler):
     @cached_property
     def post_data(self):
         content_length = int(self.headers.get("Content-Length", 0))
@@ -34,13 +26,17 @@ class SmartGardenHTTPServer(BaseHTTPRequestHandler):
         self.send_header("Content-type", "application/json")
         self.end_headers()
 
-        data["moisture"] = moisture_sensor.get_sensor_value()
-        data["light"] = light_sensor.get_sensor_value()
-        if aht20.start_measurement_ready():
-            (temperature, humidity) = aht20.get_sensor_value()
-            data["temperature"] = temperature
-            data["humidity"] = humidity
-        data["air_quality"] = air_quality.get_sensor_value()
+        if self.server.aht20_sensor.start_measurement_ready():
+            (temperature_c, temperature_f, humidity) = self.server.aht20_sensor.get_sensor_value()
+
+        data = {
+            "moisture": self.server.moisture_sensor.get_sensor_value(),
+            "light": self.server.light_sensor.get_sensor_value(),
+            "temperature_C": temperature_c,
+            "temperature_F": temperature_f,
+            "humidity": humidity,
+            "air_quality": self.server.air_quality_sensor.get_sensor_value()
+        }
 
         self.wfile.write(bytes(json.dumps(data), "utf-8"))
 
@@ -51,9 +47,3 @@ class SmartGardenHTTPServer(BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/plain")
         self.end_headers()
         self.wfile.write(bytes("", "utf-8"))
-
-server = HTTPServer((HOST,PORT),SmartGardenHTTPServer)
-print("Server started")
-server.serve_forever()
-server.server_close()
-print("Server stoped")
