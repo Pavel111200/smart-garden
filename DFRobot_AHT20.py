@@ -55,9 +55,11 @@ class DFRobot_AHT20:
   _humidity = 0.0
   _temperature = 0.0
   
-  def __init__(self):
+  def __init__(self, temp_turn_on_value = 24, humd_turn_on_value = 80):
     self._addr = self.AHT20_DEF_I2C_ADDR
     self._bus = smbus.SMBus(1)
+    self.temp_turn_on_value = temp_turn_on_value
+    self.humd_turn_on_value = humd_turn_on_value
 
   def begin(self):
     '''!
@@ -229,4 +231,13 @@ class DFRobot_AHT20:
     temperature_c = self.get_temperature_C()
     temperature_f = self.get_temperature_F()
     humidity      = self.get_humidity_RH()
-    return (format(temperature_c, ".2f") + "C",format(temperature_f, ".2f") + "F", format(humidity, ".2f") + "RH")
+    return (format(temperature_c, ".2f") + " C",format(temperature_f, ".2f") + " F", format(humidity, ".2f") + " RH")
+  
+  def should_turn_on_ventilation(self):
+    turn_on = False
+    if self.start_measurement_ready():
+      if(self.get_temperature_C() > self.temp_turn_on_value 
+         or self.get_humidity_RH() > self.humd_turn_on_value):
+        turn_on = True
+    return turn_on
+
