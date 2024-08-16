@@ -233,11 +233,11 @@ class DFRobot_AHT20:
     humidity      = self.get_humidity_RH()
     return (format(temperature_c, ".2f") + " C",format(temperature_f, ".2f") + " F", format(humidity, ".2f") + " RH")
   
-  def should_turn_on_ventilation(self):
-    turn_on = False
+  def should_turn_on_actuator(self):
+    should_turn_on = False
     if self.start_measurement_ready():
       if(self.get_temperature_C() > self.temp_turn_on_value 
          or self.get_humidity_RH() > self.humd_turn_on_value):
-        turn_on = True
-    return turn_on
+        should_turn_on = True
+    return should_turn_on
 

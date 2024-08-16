@@ -5,7 +5,7 @@ from light import Light
 from DFRobot_AHT20 import *
 from air_quality import Air_quality
 import json
-import cgi
+import re
 
 
 HOST = "192.168.2.236"
@@ -22,6 +22,17 @@ class SmartGardenHTTPHandler(BaseHTTPRequestHandler):
 
         self.send_header("Content-type", "application/json")
         self.end_headers()
+
+        if re.search('/turn-on-values', self.path):
+            data = {
+                "moisture": self.server.moisture_sensor.turn_on_value,
+                "temperature": self.server.aht20_sensor.temp_turn_on_value,
+                "humidity": self.server.aht20_sensor.humd_turn_on_value,
+                "air_quality": self.server.air_quality_sensor.turn_on_value,
+                "light": self.server.light_sensor.turn_on_value
+            }
+            self.wfile.write(bytes(json.dumps(data), "utf-8"))
+            return
 
         if self.server.aht20_sensor.start_measurement_ready():
             (temperature_c,
@@ -42,13 +53,15 @@ class SmartGardenHTTPHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         data = json.loads(self.post_data)
         if data["moisture"] != 0:
-            self.server.moisture_sensor.watering_value = data["moisture"]
+            self.server.moisture_sensor.turn_on_value = data["moisture"]
         if data["light"] != 0:
             self.server.light_sensor.turn_on_value = data["light"]
         if data["temperature"] != 0:
             self.server.aht20_sensor.temp_turn_on_value = data["temperature"]
         if data["humidity"] != 0:
             self.server.aht20_sensor.humd_turn_on_value = data["humidity"]
+        if data["air_quality"] != 0:
+            self.server.air_quality_sensor.turn_on_value = data["air_quality"]
         self.send_response(200)
 
         self.send_header("Content-type", "text/plain")

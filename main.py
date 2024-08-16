@@ -31,36 +31,30 @@ server_thread = threading.Thread(target=server.serve_forever)
 server_thread.start()
 
 while (True):
-    if moisture_sensor.should_water() and water_pump.value == 0:
+    if moisture_sensor.should_turn_on_actuator() and water_pump.value == 0:
         pump_thread = threading.Thread(target=water_plant)
         pump_thread.start()
 
-    if light_sensor.should_turn_on_lights() and not led.is_lit:
+    if light_sensor.should_turn_on_actuator() and not led.is_lit:
         led.on()
-    elif led.is_lit and not light_sensor.should_turn_on_lights():
+    elif led.is_lit and not light_sensor.should_turn_on_actuator():
         led.off()
 
-    time.sleep(1)
-
-    if aht20_sensor.should_turn_on_ventilation() and fan.value == 0:
+    if aht20_sensor.should_turn_on_actuator() and fan.value == 0:
         fan.on()
-    elif not aht20_sensor.should_turn_on_ventilation() and fan.value == 1:
-        fan.off()
 
-    # if air_quality_sensor.should_turn_on_ventilation() and fan.value == 0:
-    #     fan.on()
-    # elif fan.value == 1:
-    #     fan.off()
+    if air_quality_sensor.should_turn_on_actuator() and fan.value == 0:
+        fan.on()
+    
+    if(not aht20_sensor.should_turn_on_actuator()
+       and not air_quality_sensor.should_turn_on_actuator()
+       and fan.value == 1):
+        fan.off()
 
     # print(moisture_sensor.get_sensor_value())
     # print(light_sensor.get_sensor_value())
-    if aht20_sensor.start_measurement_ready():
-        print(aht20_sensor.get_sensor_value())
+    # if aht20_sensor.start_measurement_ready():
+    #     print(aht20_sensor.get_sensor_value())
     # print(air_quality_sensor.get_sensor_value())
 
-    # print("Should water " + str(moisture_sensor.should_water()))
-    # print("Turn lights on " + str(light_sensor.should_turn_on_lights()))
-    # print("AHT20 should turn on " + str(aht20_sensor.should_turn_on_ventilation()))
-    # print("Air quality should turn on " + str(air_quality_sensor.should_turn_on_ventilation()))
-
-    time.sleep(2)
+    time.sleep(3)
