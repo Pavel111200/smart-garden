@@ -8,7 +8,7 @@ import json
 import re
 
 
-HOST = "192.168.2.236"
+HOST = "192.168.112.15"
 PORT = 9999
 
 class SmartGardenHTTPHandler(BaseHTTPRequestHandler):
@@ -40,17 +40,73 @@ class SmartGardenHTTPHandler(BaseHTTPRequestHandler):
                 humidity) = self.server.aht20_sensor.get_sensor_value()
 
         data = {
-            "moisture": self.server.moisture_sensor.get_sensor_value(),
+            "moisture": f"{self.server.moisture_sensor.get_sensor_value(): .2f}",
             "light": self.server.light_sensor.get_sensor_value(),
             "temperature_C": temperature_c,
             "temperature_F": temperature_f,
             "humidity": humidity,
-            "air_quality": self.server.air_quality_sensor.get_sensor_value()
+            "air_quality": f"{self.server.air_quality_sensor.get_sensor_value(): .2f}"
         }
 
         self.wfile.write(bytes(json.dumps(data), "utf-8"))
 
     def do_POST(self):
+        if re.search('/fan/on', self.path):
+            self.server.fan.on()
+            self.send_response(200)
+
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+    
+            self.wfile.write(bytes("", "utf-8"))
+            return
+        elif re.search('/fan/off', self.path):
+            self.server.fan.off()
+            self.send_response(200)
+
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+    
+            self.wfile.write(bytes("", "utf-8"))
+            return
+        elif re.search('/pump/on', self.path):
+            self.server.water_pump.on()
+            self.send_response(200)
+
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+    
+            self.wfile.write(bytes("", "utf-8"))
+            return
+        elif re.search('/pump/off', self.path):
+            self.server.water_pump.off()
+            self.send_response(200)
+
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+    
+            self.wfile.write(bytes("", "utf-8"))
+            return
+        elif re.search('/light/on', self.path):
+            self.server.led.on()
+            self.send_response(200)
+
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+    
+            self.wfile.write(bytes("", "utf-8"))
+            return
+        elif re.search('/light/off', self.path):
+            self.server.led.off()
+            self.send_response(200)
+
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+    
+            self.wfile.write(bytes("", "utf-8"))
+            return
+
+
         data = json.loads(self.post_data)
         if data["moisture"] != 0:
             self.server.moisture_sensor.turn_on_value = data["moisture"]

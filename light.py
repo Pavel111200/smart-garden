@@ -9,8 +9,8 @@ class Light(Sensor):
         super().__init__(turn_on_value)
     
     def get_sensor_value(self):
-        self.bus.write_byte(0x23, 0x10)
-        time.sleep(0.18)
+        # self.bus.write_byte(0x23, 0x10)
+        # time.sleep(0.18)
         data = self.bus.read_i2c_block_data(0x23, 0x10, 2)
         result = (data[1] + (256 * data[0])) / 1.2
         return format(result,'.0f') + " lx"
