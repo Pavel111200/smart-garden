@@ -88,16 +88,15 @@ class SmartGardenHTTPHandler(BaseHTTPRequestHandler):
 
         elif re.search('/', self.path):
             data = json.loads(self.post_data)
-            if data["moisture"] != 0:
-                self.server.moisture_sensor.turn_on_value = data["moisture"]
-            if data["light"] != 0:
-                self.server.light_sensor.turn_on_value = data["light"]
-            if data["temperature"] != 0:
-                self.server.aht20_sensor.temp_turn_on_value = data["temperature"]
-            if data["humidity"] != 0:
-                self.server.aht20_sensor.humd_turn_on_value = data["humidity"]
-            if data["air_quality"] != 0:
-                self.server.air_quality_sensor.turn_on_value = data["air_quality"]
             
+            self.server.moisture_sensor.turn_on_value = data["moisture"]
+            
+            self.server.light_sensor.turn_on_value = data["light"]
+            
+            self.server.aht20_sensor.temp_turn_on_value = data["temperature"]
+            
+            self.server.aht20_sensor.humd_turn_on_value = data["humidity"]
+           
+            self.server.air_quality_sensor.turn_on_value = data["air_quality"]         
         
             self.wfile.write(bytes("", "utf-8"))
