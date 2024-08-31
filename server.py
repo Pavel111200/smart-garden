@@ -1,9 +1,5 @@
 from http.server import BaseHTTPRequestHandler
 from functools import cached_property
-from moisture import Moisture
-from light import Light
-from DFRobot_AHT20 import *
-from air_quality import Air_quality
 import json
 import re
 
@@ -40,12 +36,12 @@ class SmartGardenHTTPHandler(BaseHTTPRequestHandler):
                 humidity) = self.server.aht20_sensor.get_sensor_value()
 
         data = {
-            "moisture": f"{self.server.moisture_sensor.get_sensor_value(): .2f}",
+            "moisture": self.server.moisture_sensor.get_sensor_value(),
             "light": self.server.light_sensor.get_sensor_value(),
             "temperature_C": temperature_c,
             "temperature_F": temperature_f,
             "humidity": humidity,
-            "air_quality": f"{self.server.air_quality_sensor.get_sensor_value(): .2f}"
+            "air_quality": self.server.air_quality_sensor.get_sensor_value()
         }
 
         self.wfile.write(bytes(json.dumps(data), "utf-8"))

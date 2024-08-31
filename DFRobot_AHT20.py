@@ -228,16 +228,12 @@ class DFRobot_AHT20:
       return []
 
   def get_sensor_value(self):
-    temperature_c = self.get_temperature_C()
-    temperature_f = self.get_temperature_F()
-    humidity      = self.get_humidity_RH()
-    return (format(temperature_c, ".2f") + " C",format(temperature_f, ".2f") + " F", format(humidity, ".2f") + " RH")
+    return (self.get_temperature_C(), self.get_temperature_F(), self.get_humidity_RH())
   
   def should_turn_on_actuator(self):
-    should_turn_on = False
     if self.start_measurement_ready():
       if(self.get_temperature_C() > self.temp_turn_on_value 
          or self.get_humidity_RH() > self.humd_turn_on_value):
-        should_turn_on = True
-    return should_turn_on
+        return True
+    return False
 

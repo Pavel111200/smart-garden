@@ -1,7 +1,8 @@
 import smbus
 import time
+from sensor import Sensor
 
-class BH1750():
+class BH1750(Sensor):
     """ Implement BH1750 communication. """
     # Define some constants from the datasheet
     POWER_DOWN = 0x00 # No active state
@@ -23,11 +24,12 @@ class BH1750():
     # Device is automatically set to Power Down after measurement.
     ONE_TIME_LOW_RES_MODE = 0x23
 
-    def __init__(self, addr=0x23):
+    def __init__(self, addr=0x23, turn_on_value = 400):
         self.bus = smbus.SMBus(1)
         self.addr = addr
         self.power_down()
         self.set_sensitivity()
+        super().__init__(turn_on_value)
 
     def _set_mode(self, mode):
         self.mode = mode
@@ -108,9 +110,11 @@ class BH1750():
 
     def measure_high_res2(self, additional_delay=0):
         return self.do_measurement(self.ONE_TIME_HIGH_RES_MODE_2, additional_delay)
+    
+    def get_sensor_value(self):
+        return self.measure_high_res()
 
     def should_turn_on_actuator(self):
-        should_turn_on = False
-        if(self.measure_high_res() <= 400):
-            should_turn_on = True
-        return should_turn_on
+        if(self.get_sensor_value() <= self.turn_on_value):
+            return True
+        return False
